@@ -197,6 +197,42 @@ input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--sand); }
   background: #26211b; border: 1px solid var(--line); box-shadow: var(--shadow);
 }
 
+.ota {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: grid;
+  place-items: center;
+  background: rgba(12, 10, 8, 0.78);
+  backdrop-filter: blur(12px);
+  padding: 20px;
+}
+.ota[hidden] { display: none !important; }
+.ota-card {
+  width: min(420px, 100%);
+  background: var(--bg-2);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 32px 24px 24px;
+  text-align: center;
+  box-shadow: var(--shadow);
+}
+.ota-pillar {
+  width: 8px;
+  height: 36px;
+  margin: 0 auto 16px;
+  background: var(--sand);
+  border-radius: 2px;
+}
+.ota-card h2 {
+  margin: 0 0 10px;
+  font-family: var(--font);
+  font-size: 26px;
+  font-weight: 500;
+}
+.ota-card .hint { margin: 0 0 20px; }
+.ota-card .btn { width: 100%; }
+
 #app[data-mode="compact"] { --side: 64px; }
 #app[data-mode="compact"] .nav-btn span, #app[data-mode="compact"] .brand-sub, #app[data-mode="compact"] .chip span { display: none; }
 #app[data-sidebar="hidden"] { --side: 0px; }

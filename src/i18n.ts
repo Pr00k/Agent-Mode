@@ -62,6 +62,11 @@ export const strings = {
     shotOk: "لقطة الشاشة في الحافظة",
     filesPicked: "اختر الملفات ثم أفلتها داخل نافذة Agent",
     clipEmpty: "الحافظة فارغة أو محجوبة",
+    otaTitle: "يتوفر تحديث",
+    otaUpdate: "تحديث",
+    otaDone: "تم تحديث المحتوى. التطبيق ما زال مثبتاً.",
+    otaChecking: "جاري التحقق من التحديثات…",
+    otaNone: "لا يوجد تحديث جديد",
   },
   en: {
     frontier: "the frontier",
@@ -124,6 +129,11 @@ export const strings = {
     shotOk: "Screenshot copied to clipboard",
     filesPicked: "Drop the files onto the Agent window",
     clipEmpty: "Clipboard empty or blocked",
+    otaTitle: "Update available",
+    otaUpdate: "Update",
+    otaDone: "Content updated. The app stays installed.",
+    otaChecking: "Checking for updates…",
+    otaNone: "You're up to date",
   },
 } as const;
 

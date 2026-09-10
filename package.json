@@ -1,7 +1,7 @@
 {
   "name": "arena-agent",
   "private": true,
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "Arena Agent native shell — opens https://arena.ai/agent as an app, not a browser.",
   "type": "module",
   "engines": {

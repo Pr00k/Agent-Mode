@@ -9,6 +9,7 @@ import {
   setBgOn,
   startKeepAlive,
 } from "./keepalive";
+import { checkForContentUpdate, refreshInside, type Manifest } from "./ota";
 
 const AGENT = "https://arena.ai/agent";
 const ROUTES: Record<string, string> = {
@@ -36,8 +37,11 @@ const compact = document.getElementById("compact") as HTMLInputElement;
 const autohide = document.getElementById("autohide") as HTMLInputElement;
 const bgRun = document.getElementById("bg-run") as HTMLInputElement;
 const stayAwake = document.getElementById("stay-awake") as HTMLInputElement;
+const otaEl = document.getElementById("ota")!;
+const otaNotes = document.getElementById("ota-notes")!;
 
 let lang: Lang = detectLang();
+let pendingOta: Manifest | null = null;
 let tabId = 1;
 
 function t(key: Key): string {
@@ -220,6 +224,21 @@ function wire(): void {
       lang = lang === "ar" ? "en" : "ar";
       applyI18n();
     }
+    if (action === "ota-apply") {
+      if (!pendingOta) return;
+      otaEl.hidden = true;
+      loader.hidden = false;
+      await refreshInside(frame, pendingOta);
+      pendingOta = null;
+      showToast(t("otaDone"));
+      return;
+    }
+    if (action === "ota-check") {
+      showToast(t("otaChecking"));
+      await pollOta();
+      if (otaEl.hidden) showToast(t("otaNone"));
+      return;
+    }
     if (action === "win-close" || action === "win-min" || action === "win-max" || action === "pin") {
       await nativeWindow(action);
     }
@@ -317,11 +336,15 @@ function wire(): void {
   });
 
   window.addEventListener("resize", layout);
-  window.addEventListener("online", () => showToast(t("connecting")));
+  window.addEventListener("online", () => {
+    showToast(t("connecting"));
+    void pollOta();
+  });
   document.addEventListener("visibilitychange", () => {
     if (document.visibilityState === "hidden" && isBgOn()) {
       saveSession(frame.src || AGENT);
     }
+    if (document.visibilityState === "visible") void pollOta();
   });
 }
 
@@ -345,3 +368,14 @@ if (restored && restored.startsWith("https://arena.ai")) {
 void bootTauri();
 void registerSw();
 void startKeepAlive();
+void pollOta();
+window.setInterval(() => void pollOta(), 5 * 60 * 1000);
+
+async function pollOta(): Promise<void> {
+  const man = await checkForContentUpdate();
+  if (!man) return;
+  pendingOta = man;
+  const note = lang === "ar" ? man.notes?.ar : man.notes?.en;
+  otaNotes.textContent = note || t("otaTitle");
+  otaEl.hidden = false;
+}

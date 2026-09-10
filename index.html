@@ -11,7 +11,7 @@
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <meta name="apple-mobile-web-app-title" content="Arena Agent" />
+    <meta name="apple-mobile-web-app-title" content="Agent Mode" />
     <meta
       name="description"
       content="Agent Mode by Arena — native shell for arena.ai/agent."
@@ -196,6 +196,7 @@
         <p class="hint" data-i18n="backgroundHint">
           إغلاق النافذة أو الشاشة لا يوقف المشروع. على سطح المكتب يبقى في شريط النظام حتى Quit.
         </p>
+        <button class="btn ghost" data-action="ota-check" data-i18n="otaChecking">التحقق من التحديثات</button>
         <p class="hint" data-i18n="settingsHint">
           الاختصارات: ⌘K بحث · ⌘N محادثة جديدة · ⌘R تحديث · ⌘1 Agent
         </p>
@@ -215,6 +216,15 @@
       </nav>
 
       <div class="toast" id="toast" hidden></div>
+
+      <div class="ota" id="ota" hidden>
+        <div class="ota-card" role="dialog" aria-modal="true" aria-labelledby="ota-title">
+          <div class="ota-pillar" aria-hidden="true"></div>
+          <h2 id="ota-title" data-i18n="otaTitle">يتوفر تحديث</h2>
+          <p id="ota-notes" class="hint"></p>
+          <button class="btn primary" data-action="ota-apply" data-i18n="otaUpdate">تحديث</button>
+        </div>
+      </div>
     </div>
     <script type="module" src="/src/main.ts"></script>
   </body>

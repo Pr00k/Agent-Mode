@@ -1,0 +1,16 @@
+{
+  "contentVersion": "1.3.0",
+  "releasedAt": "2026-09-10T12:00:00Z",
+  "agentUrl": "https://arena.ai/agent",
+  "historyUrl": "https://arena.ai/history/search",
+  "leaderboardUrl": "https://arena.ai/leaderboard/agent",
+  "theme": {
+    "bg": "#14110e",
+    "sand": "#e2c56a",
+    "paper": "#f3ead8"
+  },
+  "notes": {
+    "ar": "تحديث محتوى Agent Mode من الخادم. التطبيق يبقى مثبتاً.",
+    "en": "Agent Mode content update from the server. The app stays installed."
+  }
+}
