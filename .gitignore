@@ -20,5 +20,6 @@ coverage/
 .turbo/
 .vite/
 *.zip
+!Arena-Agent.zip
 !public/**
 .cache/
