@@ -10,6 +10,8 @@ import {
   startKeepAlive,
 } from "./keepalive";
 import { checkForContentUpdate, refreshInside, type Manifest } from "./ota";
+import { arenaHref } from "./core/url";
+import { mark, measure } from "./core/metrics";
 
 const AGENT = "https://arena.ai/agent";
 const ROUTES: Record<string, string> = {
@@ -97,7 +99,7 @@ function navigate(id: string): void {
     setActiveNav("bridge");
     return;
   }
-  const url = ROUTES[id] ?? AGENT;
+  const url = arenaHref(ROUTES[id] ?? AGENT, AGENT);
   loader.hidden = false;
   fallback.hidden = true;
   frame.src = url;
@@ -357,19 +359,19 @@ async function registerSw(): Promise<void> {
   }
 }
 
+mark("boot");
 applyI18n();
 layout();
 addTab(AGENT);
 wire();
 const restored = restoreSession();
-if (restored && restored.startsWith("https://arena.ai")) {
-  frame.src = restored;
-}
+if (restored) frame.src = restored;
 void bootTauri();
 void registerSw();
 void startKeepAlive();
 void pollOta();
 window.setInterval(() => void pollOta(), 5 * 60 * 1000);
+measure("boot", "boot");
 
 async function pollOta(): Promise<void> {
   const man = await checkForContentUpdate();

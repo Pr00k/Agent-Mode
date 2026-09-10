@@ -2,7 +2,9 @@
 
 ```bash
 npm install
-npm run dev
+npm run typecheck
+npm test
+npm run build
 npm run tauri:build
 npx cap add android && npx cap sync
 npx cap add ios && npx cap sync

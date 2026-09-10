@@ -1,4 +1,5 @@
 import { isTauri } from "./bridge";
+import { isArenaHttps } from "./core/url";
 
 const BG = "arena.bg";
 const AWAKE = "arena.awake";
@@ -23,6 +24,7 @@ export function setAwakeOn(on: boolean): void {
 }
 
 export function saveSession(url: string): void {
+  if (!isArenaHttps(url)) return;
   try {
     sessionStorage.setItem("arena.url", url);
     localStorage.setItem("arena.url", url);
@@ -33,7 +35,9 @@ export function saveSession(url: string): void {
 }
 
 export function restoreSession(): string | null {
-  return sessionStorage.getItem("arena.url") || localStorage.getItem("arena.url");
+  const raw = sessionStorage.getItem("arena.url") || localStorage.getItem("arena.url");
+  if (!raw || !isArenaHttps(raw)) return null;
+  return raw;
 }
 
 export async function startKeepAlive(): Promise<void> {

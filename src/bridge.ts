@@ -1,6 +1,10 @@
 import type { Key } from "./i18n";
+import { authorize } from "./core/capabilities";
+import { AppError } from "./core/errors";
+import { isArenaHttps } from "./core/url";
 
 const AGENT = "https://arena.ai/agent";
+const MAX_SHOT = 4096;
 
 export function isTauri(): boolean {
   return typeof window !== "undefined" && "__TAURI_INTERNALS__" in window;
@@ -28,21 +32,12 @@ async function writeClipboard(text: string): Promise<boolean> {
   }
 }
 
-async function readClipboard(): Promise<string> {
-  if (isTauri()) {
-    const { readText } = await import("@tauri-apps/plugin-clipboard-manager");
-    return (await readText()) ?? "";
-  }
-  return navigator.clipboard.readText();
-}
-
 export async function runBridge(
   action: string,
   t: (k: Key) => string,
 ): Promise<string> {
-  if (!isBridgeOn() && action !== "toggle") {
-    return t("disabled");
-  }
+  const auth = authorize(action);
+  if (!auth.ok) return t("disabled");
 
   switch (action) {
     case "screenshot": {
@@ -50,37 +45,43 @@ export async function runBridge(
         video: true,
         audio: false,
       });
-      const track = stream.getVideoTracks()[0];
-      const shot =
-        "ImageCapture" in window
-          ? await new ImageCapture(track).grabFrame()
-          : await grabFrame(track);
-      track.stop();
-      stream.getTracks().forEach((tr) => tr.stop());
-      const blob = await frameToPng(shot);
       try {
-        await navigator.clipboard.write([
-          new ClipboardItem({ "image/png": blob }),
-        ]);
-      } catch {
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = "arena-agent-shot.png";
-        a.click();
-        URL.revokeObjectURL(url);
+        const track = stream.getVideoTracks()[0];
+        if (!track) throw new AppError("PlatformCapabilityError", "no video track");
+        const shot =
+          "ImageCapture" in window
+            ? await new ImageCapture(track).grabFrame()
+            : await grabFrame(track);
+        const blob = await frameToPng(shot);
+        try {
+          await navigator.clipboard.write([
+            new ClipboardItem({ "image/png": blob }),
+          ]);
+        } catch {
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = "agent-mode-shot.png";
+          a.click();
+          URL.revokeObjectURL(url);
+        }
+        return t("shotOk");
+      } finally {
+        stream.getTracks().forEach((tr) => tr.stop());
       }
-      return t("shotOk");
     }
     case "clipboard": {
+      /* Do not echo clipboard contents into the UI. */
       try {
-        const text = await readClipboard();
-        if (!text) return t("clipEmpty");
-        return `${t("clip")}: ${text.slice(0, 180)}`;
+        if (isTauri()) {
+          const { readText } = await import("@tauri-apps/plugin-clipboard-manager");
+          const text = await readText();
+          return text ? t("copied") : t("clipEmpty");
+        }
+        const text = await navigator.clipboard.readText();
+        return text ? t("copied") : t("clipEmpty");
       } catch {
-        const sample = "Arena Agent";
-        const ok = await writeClipboard(sample);
-        return ok ? t("copied") : t("needPerm");
+        return t("needPerm");
       }
     }
     case "files": {
@@ -91,10 +92,13 @@ export async function runBridge(
       return t("filesPicked");
     }
     case "voice": {
-      const SR = (window as unknown as {
-        SpeechRecognition?: new () => SpeechRec;
-        webkitSpeechRecognition?: new () => SpeechRec;
-      }).SpeechRecognition ||
+      const SR =
+        (
+          window as unknown as {
+            SpeechRecognition?: new () => SpeechRec;
+            webkitSpeechRecognition?: new () => SpeechRec;
+          }
+        ).SpeechRecognition ||
         (window as unknown as { webkitSpeechRecognition?: new () => SpeechRec })
           .webkitSpeechRecognition;
       if (!SR) return t("voiceOff");
@@ -113,12 +117,12 @@ export async function runBridge(
         let granted = await isPermissionGranted();
         if (!granted) granted = (await requestPermission()) === "granted";
         if (!granted) return t("needPerm");
-        sendNotification({ title: "Arena Agent", body: AGENT });
+        sendNotification({ title: "Agent Mode", body: AGENT });
         return t("notified");
       }
       const perm = await Notification.requestPermission();
       if (perm !== "granted") return t("needPerm");
-      new Notification("Arena Agent", { body: AGENT });
+      new Notification("Agent Mode", { body: AGENT });
       return t("notified");
     }
     case "share": {
@@ -137,19 +141,18 @@ export async function runBridge(
       return t("filesPicked");
     }
     case "run-cmd": {
-      const raw = (document.getElementById("cu-cmd") as HTMLInputElement | null)?.value.trim() ?? "";
+      const raw =
+        (document.getElementById("cu-cmd") as HTMLInputElement | null)?.value.trim() ?? "";
       if (!raw) return t("cmdPh");
       if (!window.confirm(`${t("runConfirm")}\n${raw}`)) return t("cancelled");
-      if (/^https?:\/\//i.test(raw)) {
-        window.open(raw, "agent-frame");
-        return t("opened");
-      }
-      return t("filesPicked");
+      if (!isArenaHttps(raw)) return t("needPerm");
+      window.open(raw, "agent-frame");
+      return t("opened");
     }
     case "github":
       return "github";
     default:
-      return "";
+      return t("disabled");
   }
 }
 
@@ -170,14 +173,16 @@ async function grabFrame(track: MediaStreamTrack): Promise<ImageBitmap> {
 }
 
 async function frameToPng(frame: ImageBitmap): Promise<Blob> {
+  const w = Math.min(frame.width, MAX_SHOT);
+  const h = Math.min(frame.height, MAX_SHOT);
   const canvas = document.createElement("canvas");
-  canvas.width = frame.width;
-  canvas.height = frame.height;
+  canvas.width = w;
+  canvas.height = h;
   const ctx = canvas.getContext("2d");
-  if (!ctx) throw new Error("canvas");
-  ctx.drawImage(frame, 0, 0);
+  if (!ctx) throw new AppError("PlatformCapabilityError", "canvas");
+  ctx.drawImage(frame, 0, 0, w, h);
   return new Promise((resolve, reject) => {
-    canvas.toBlob((b) => (b ? resolve(b) : reject(new Error("png"))), "image/png");
+    canvas.toBlob((b) => (b ? resolve(b) : reject(new AppError("UnknownError", "png"))), "image/png");
   });
 }
 
