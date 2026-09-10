@@ -1,0 +1,8 @@
+{
+  "$schema": "../gen/schemas/mobile-schema.json",
+  "identifier": "mobile",
+  "description": "Mobile haptics only. No remote IPC.",
+  "windows": ["main"],
+  "platforms": ["iOS", "android"],
+  "permissions": ["haptics:default"]
+}

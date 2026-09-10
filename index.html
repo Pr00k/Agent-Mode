@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1"
+    />
+    <meta name="theme-color" content="#07070c" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Arena Agent" />
+    <meta
+      name="description"
+      content="Arena Agent — native shell for arena.ai/agent. Not a browser."
+    />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="icon" href="/favicon.png" type="image/png" />
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+    <title>Arena Agent</title>
+    <link rel="stylesheet" href="/src/styles.css" />
+  </head>
+  <body>
+    <div id="app" data-mode="desktop" data-sidebar="expanded">
+      <header class="titlebar" data-tauri-drag-region>
+        <div class="traffic" aria-hidden="true">
+          <button class="win-btn close" data-action="win-close" tabindex="-1"></button>
+          <button class="win-btn min" data-action="win-min" tabindex="-1"></button>
+          <button class="win-btn max" data-action="win-max" tabindex="-1"></button>
+        </div>
+        <div class="brand" data-tauri-drag-region>
+          <img class="brand-mark" src="/icons/icon-64.png" width="22" height="22" alt="" />
+          <span class="brand-name">Arena Agent</span>
+          <span class="brand-dot"></span>
+          <span class="brand-sub" data-i18n="frontier">the frontier</span>
+        </div>
+        <div class="tabs" id="tabs" role="tablist"></div>
+        <button class="icon-btn" data-action="new-tab" title="New chat" data-i18n-title="newChat">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg>
+        </button>
+        <div class="title-actions">
+          <button class="chip" data-action="palette" title="⌘K">
+            <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" /><path d="M20 20l-3.5-3.5" /></svg>
+            <span data-i18n="search">بحث</span>
+            <kbd>⌘K</kbd>
+          </button>
+          <button class="icon-btn" data-action="reload" data-i18n-title="reload">
+            <svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-2.3-6M21 5v5h-5" /></svg>
+          </button>
+          <button class="icon-btn" data-action="pin" data-i18n-title="alwaysOnTop">
+            <svg viewBox="0 0 24 24"><path d="M12 17v5M8 3h8l-1 7h3l-6 7-6-7h3L8 3z" /></svg>
+          </button>
+        </div>
+      </header>
+
+      <aside class="sidebar" id="sidebar">
+        <nav class="nav">
+          <button class="nav-btn active" data-nav="agent" data-i18n-title="agent">
+            <svg viewBox="0 0 24 24"><path d="M12 3l8 4.5v9L12 21l-8-4.5v-9L12 3z" /><circle cx="12" cy="12" r="2.2" /></svg>
+            <span data-i18n="agent">Agent</span>
+          </button>
+          <button class="nav-btn" data-nav="new" data-i18n-title="newChat">
+            <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" /></svg>
+            <span data-i18n="newChat">محادثة جديدة</span>
+          </button>
+          <button class="nav-btn" data-nav="history" data-i18n-title="history">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8" /><path d="M12 8v5l3 2" /></svg>
+            <span data-i18n="history">السجل</span>
+          </button>
+          <button class="nav-btn" data-nav="leaderboard" data-i18n-title="leaderboard">
+            <svg viewBox="0 0 24 24"><path d="M8 21h8M12 17v4M6 4h12v5a6 6 0 0 1-12 0V4z" /></svg>
+            <span data-i18n="leaderboard">المتصدرين</span>
+          </button>
+          <button class="nav-btn" data-nav="bridge" data-i18n-title="bridge">
+            <svg viewBox="0 0 24 24"><rect x="7" y="2" width="10" height="20" rx="2" /><path d="M11 19h2" /></svg>
+            <span data-i18n="bridge">جسر الجهاز</span>
+          </button>
+        </nav>
+        <div class="sidebar-foot">
+          <button class="nav-btn" data-action="lang">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" /><path d="M3 12h18M12 3c3 4 3 14 0 18M12 3c-3 4-3 14 0 18" /></svg>
+            <span id="lang-label">EN</span>
+          </button>
+          <button class="nav-btn" data-action="settings" data-i18n-title="settings">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" /><path d="M19.4 15a7.7 7.7 0 0 0 .1-6l2-1.2-2-3.4-2.3.7a7.8 7.8 0 0 0-5.2-2L11.5 1h-4l-.5 2.1a7.8 7.8 0 0 0-5.2 2L-.5 4.4l-2 3.4 2 1.2a7.7 7.7 0 0 0 .1 6l-2 1.2 2 3.4 2.3-.7a7.8 7.8 0 0 0 5.2 2l.5 2.1h4l.5-2.1a7.8 7.8 0 0 0 5.2-2l2.3.7 2-3.4-2-1.2z" transform="translate(2.5 -1) scale(0.85)" /></svg>
+            <span data-i18n="settings">إعدادات</span>
+          </button>
+        </div>
+      </aside>
+
+      <main class="stage" id="stage">
+        <div class="loader" id="loader">
+          <div class="loader-core"></div>
+          <p data-i18n="connecting">جارٍ الاتصال بـ Arena Agent…</p>
+        </div>
+        <iframe
+          id="agent-frame"
+          name="agent-frame"
+          title="Arena Agent"
+          src="https://arena.ai/agent"
+          allow="accelerometer; autoplay; clipboard-read; clipboard-write; display-capture; encrypted-media; fullscreen; geolocation; microphone; camera; publickey-credentials-get; publickey-credentials-create; screen-wake-lock; storage-access; web-share"
+          referrerpolicy="strict-origin-when-cross-origin"
+        ></iframe>
+        <section class="fallback" id="fallback" hidden>
+          <img src="/icons/icon-192.png" width="88" height="88" alt="" />
+          <h1 data-i18n="fallbackTitle">Arena Agent جاهز</h1>
+          <p data-i18n="fallbackBody">
+            المتصفح منع تضمين الموقع داخل إطار. افتح النموذج مباشرة داخل هذا التطبيق.
+          </p>
+          <div class="fallback-actions">
+            <a class="btn primary" href="https://arena.ai/agent" target="agent-frame" data-i18n="openAgent">فتح Agent</a>
+            <button class="btn ghost" data-action="retry" data-i18n="retry">إعادة المحاولة</button>
+          </div>
+        </section>
+      </main>
+
+      <section class="panel" id="bridge-panel" hidden>
+        <header class="panel-head">
+          <h2 data-i18n="bridge">جسر الجهاز</h2>
+          <button class="icon-btn" data-action="close-panel">
+            <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" /></svg>
+          </button>
+        </header>
+        <p class="hint" data-i18n="bridgeHint">
+          أدوات محلية اختيارية. لا شيء يُرسل دون ضغطك. الموقع البعيد لا يتحكم بالجهاز.
+        </p>
+        <div class="grid">
+          <button class="tile" data-bridge="screenshot">
+            <strong data-i18n="shot">لقطة شاشة</strong>
+            <span data-i18n="shotHint">تُنسخ للحافظة لإرفاقها في Agent</span>
+          </button>
+          <button class="tile" data-bridge="clipboard">
+            <strong data-i18n="clip">الحافظة</strong>
+            <span data-i18n="clipHint">قراءة / كتابة النص</span>
+          </button>
+          <button class="tile" data-bridge="files">
+            <strong data-i18n="files">ملفات</strong>
+            <span data-i18n="filesHint">اختيار ملفات ثم سحبها إلى Agent</span>
+          </button>
+          <button class="tile" data-bridge="voice">
+            <strong data-i18n="voice">صوت</strong>
+            <span data-i18n="voiceHint">إملاء إلى الحافظة</span>
+          </button>
+          <button class="tile" data-bridge="notify">
+            <strong data-i18n="notify">إشعار</strong>
+            <span data-i18n="notifyHint">اختبار إشعارات النظام</span>
+          </button>
+          <button class="tile" data-bridge="share">
+            <strong data-i18n="share">مشاركة</strong>
+            <span data-i18n="shareHint">مشاركة رابط Agent</span>
+          </button>
+        </div>
+        <label class="switch">
+          <input type="checkbox" id="bridge-enabled" />
+          <span data-i18n="enableBridge">تفعيل جسر الجهاز على هذا الجهاز</span>
+        </label>
+      </section>
+
+      <section class="panel" id="settings-panel" hidden>
+        <header class="panel-head">
+          <h2 data-i18n="settings">إعدادات</h2>
+          <button class="icon-btn" data-action="close-panel">
+            <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" /></svg>
+          </button>
+        </header>
+        <label class="field">
+          <span data-i18n="zoom">التكبير</span>
+          <input id="zoom" type="range" min="75" max="150" value="100" />
+        </label>
+        <label class="switch">
+          <input type="checkbox" id="compact" />
+          <span data-i18n="compact">وضع مدمج</span>
+        </label>
+        <label class="switch">
+          <input type="checkbox" id="autohide" />
+          <span data-i18n="autohide">إخفاء الشريط تلقائياً</span>
+        </label>
+        <p class="hint" data-i18n="settingsHint">
+          الاختصارات: ⌘K بحث · ⌘N محادثة جديدة · ⌘R تحديث · ⌘1 Agent
+        </p>
+      </section>
+
+      <div class="palette" id="palette" hidden>
+        <input id="palette-input" type="search" autocomplete="off" data-i18n-placeholder="palettePh" placeholder="أمر…" />
+        <ul id="palette-list"></ul>
+      </div>
+
+      <nav class="dock" id="dock">
+        <button data-nav="agent" class="active"><span data-i18n="agent">Agent</span></button>
+        <button data-nav="new"><span data-i18n="newChat">جديد</span></button>
+        <button data-nav="history"><span data-i18n="history">سجل</span></button>
+        <button data-nav="bridge"><span data-i18n="bridge">جهاز</span></button>
+        <button data-action="settings"><span data-i18n="settings">إعدادات</span></button>
+      </nav>
+
+      <div class="toast" id="toast" hidden></div>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
