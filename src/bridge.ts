@@ -123,12 +123,31 @@ export async function runBridge(
     }
     case "share": {
       if (navigator.share) {
-        await navigator.share({ title: "Arena Agent", url: AGENT });
+        await navigator.share({ title: "Agent Mode", url: AGENT });
         return t("shared");
       }
       await writeClipboard(AGENT);
       return t("copied");
     }
+    case "open-app": {
+      if (!window.confirm(t("openApp"))) return t("cancelled");
+      const input = document.createElement("input");
+      input.type = "file";
+      input.click();
+      return t("filesPicked");
+    }
+    case "run-cmd": {
+      const raw = (document.getElementById("cu-cmd") as HTMLInputElement | null)?.value.trim() ?? "";
+      if (!raw) return t("cmdPh");
+      if (!window.confirm(`${t("runConfirm")}\n${raw}`)) return t("cancelled");
+      if (/^https?:\/\//i.test(raw)) {
+        window.open(raw, "agent-frame");
+        return t("opened");
+      }
+      return t("filesPicked");
+    }
+    case "github":
+      return "github";
     default:
       return "";
   }

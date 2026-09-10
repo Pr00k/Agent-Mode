@@ -1,8 +1,8 @@
 {
   "id": "/",
-  "name": "Arena Agent",
+  "name": "Agent Mode",
   "short_name": "Agent",
-  "description": "Native shell for arena.ai/agent — not a browser tab.",
+  "description": "Agent Mode by Arena — native shell for arena.ai/agent.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",

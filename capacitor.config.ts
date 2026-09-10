@@ -7,7 +7,7 @@ import type { CapacitorConfig } from "@capacitor/cli";
  */
 const config: CapacitorConfig = {
   appId: "ai.arena.agent",
-  appName: "Arena Agent",
+  appName: "Agent Mode",
   webDir: "dist",
   backgroundColor: "#07070c",
   android: {

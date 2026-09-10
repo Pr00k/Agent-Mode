@@ -16,6 +16,7 @@ const ROUTES: Record<string, string> = {
   new: AGENT,
   history: "https://arena.ai/history/search",
   leaderboard: "https://arena.ai/leaderboard/agent",
+  github: "https://arena.ai/agent",
 };
 
 const app = document.getElementById("app")!;
@@ -222,7 +223,9 @@ function wire(): void {
     if (action === "win-close" || action === "win-min" || action === "win-max" || action === "pin") {
       await nativeWindow(action);
     }
-    if (bridge) {
+    if (bridge === "github") {
+      navigate("github");
+    } else if (bridge) {
       try {
         showToast(await runBridge(bridge, t));
       } catch {
@@ -265,10 +268,16 @@ function wire(): void {
   }, 8000);
 
   bridgeEnabled.checked = isBridgeOn();
-  bridgeEnabled.addEventListener("change", () => {
-    setBridgeOn(bridgeEnabled.checked);
-    showToast(bridgeEnabled.checked ? t("enabled") : t("disabled"));
-  });
+  const cuEnabled = document.getElementById("cu-enabled") as HTMLInputElement | null;
+  if (cuEnabled) cuEnabled.checked = isBridgeOn();
+  const syncCu = (on: boolean): void => {
+    setBridgeOn(on);
+    bridgeEnabled.checked = on;
+    if (cuEnabled) cuEnabled.checked = on;
+    showToast(on ? t("enabled") : t("disabled"));
+  };
+  bridgeEnabled.addEventListener("change", () => syncCu(bridgeEnabled.checked));
+  cuEnabled?.addEventListener("change", () => syncCu(cuEnabled.checked));
 
   zoom.value = localStorage.getItem("arena.zoom") ?? "100";
   const applyZoom = (): void => {

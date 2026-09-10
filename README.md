@@ -1,53 +1,35 @@
-# Arena Agent
+# Agent Mode
 
-تطبيق أصلي يفتح [Arena Agent](https://arena.ai/agent) **كبرنامج** بدل تبويب متصفح.
+غلاف أصلي لـ [Agent Mode](https://arena.ai/agent) من [Arena](https://arena.ai) — ليس تبويب متصفح.
 
-A native shell for [arena.ai/agent](https://arena.ai/agent) — not a browser tab.
+Official native shell for Arena **Agent Mode**.
 
-![icon](public/icons/icon-192.png)
-
-## تشغيل فوري / Run
+## تشغيل المصدر (قابل للبناء — غير مبني مسبقاً)
 
 ```bash
 npm install
-npm run dev
+npm run dev              # ويب
+npm run tauri:build      # ويندوز / ماك / لينكس
 ```
 
-يفتح على `http://0.0.0.0:1420` — يعمل على الهاتف والحاسوب تلقائياً.
+انظر `BUILD.md`.
 
-## بناء أصلي / Native
+## الهوية
 
-| المنصة | الأمر |
-|---|---|
-| ويندوز / ماك / لينكس | `npm run tauri:build` |
-| أندرويد / iOS (Tauri) | `npm run tauri android init` ثم `npm run tauri android build` |
-| أندرويد / iOS (Capacitor) | `npm run build && npx cap add android` |
-| PWA | افتح الموقع → تثبيت التطبيق |
-| Zip | `npm run zip` → `Arena-Agent.zip` |
+- الاسم: **Agent Mode** — Arena
+- الشعار: العمود (The Pillar)
+- الشعار النصي: *the frontier*
+- الألوان: رمل / جلد داكن حسب هوية Arena (harena)
 
-متطلبات Tauri: Rust 1.77+ و WebView النظام ([دليل Tauri](https://v2.tauri.app/start/prerequisites/)).
+النماذج تعمل على خوادم Arena داخل `/agent` (بما فيها ما تعرضه المنصة من Claude وGPT وGemini وغيرها). هذا الغلاف لا يستضيف أوزاناً محلية ولا نماذج بأسماء غير موجودة مثل gpt-6-Astra.
 
-## مميزات
+## التحكم بالجهاز
 
-- شريط عنوان أصلي، قائمة جانبية، تبويبات، لوحة أوامر `⌘K`
-- اختصارات: `⌘N` محادثة جديدة · `⌘R` تحديث · `⌘1` Agent
-- جسر جهاز اختياري (لقطة، حافظة، ملفات، صوت، إشعارات) — لا يُفعّل إلا بموافقتك
-- عربي / English
-- أحجام عالمية: 1440×900، حد أدنى 390×640
-- Tray + deep link `arena-agent://` في النسخة الأصلية
-- العمل في الخلفية: إغلاق النافذة يُخفي للتري، الشاشة لا تُوقف المشروع (Wake Lock + Keep Awake)
-- البناء: انظر `BUILD.md` — Vite 8.3 · TypeScript 7 · Tauri 2.11 · Capacitor 8.5
+لوحة **التحكم بالجهاز** اختيارية وموافقة صريحة لكل إجراء:
 
-## مجلدات
+- لقطة شاشة، حافظة، ملفات، صوت، إشعارات
+- فتح تطبيق/ملف تختاره
+- GitHub داخل Agent Mode
+- لا تحكم صامت، ولا تحكم بهاتف شخص آخر، ولا حقن في صفحة arena.ai
 
-```
-src/                 واجهة TypeScript
-src-tauri/           محرك Rust / Tauri 2.11
-public/              أيقونات + PWA + service worker
-docs/SCHEMAS.md      مخططات الإعدادات وتفادي الأخطاء
-docs/SUMMARY.md      ما الذي بُني وما الذي لا يمكن بناؤه
-```
-
-## رخصة
-
-MIT — انظر `LICENSE`.
+إغلاق النافذة يخفي للتري ولا يوقف الجلسة.
