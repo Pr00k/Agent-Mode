@@ -1,9 +1,9 @@
 import type { CapacitorConfig } from "@capacitor/cli";
 
 /**
- * Capacitor 7 schema — Android / iOS WebView shell.
- * Server.url is unset so production uses bundled dist/.
- * For live reload on a device, set server.url to the Vite LAN address.
+ * Capacitor 8 — Android / iOS WebView shell.
+ * server.url is unset so production uses bundled dist/.
+ * Keep-awake + https schemes so Agent work survives screen lock.
  */
 const config: CapacitorConfig = {
   appId: "ai.arena.agent",
@@ -20,6 +20,11 @@ const config: CapacitorConfig = {
     contentInset: "automatic",
     preferredContentMode: "mobile",
     scrollEnabled: true,
+    backgroundMode: ["fetch", "processing"],
+  },
+  server: {
+    androidScheme: "https",
+    iosScheme: "https",
   },
   plugins: {
     SplashScreen: {
@@ -29,6 +34,9 @@ const config: CapacitorConfig = {
     },
     Keyboard: {
       resize: "body",
+    },
+    KeepAwake: {
+      enabled: true,
     },
   },
 };

@@ -53,6 +53,13 @@ npm run tauri:build  # installers
 npm run zip          # Arena-Agent.zip
 ```
 
+## Background work (screen off / window closed)
+
+- **Desktop (Tauri):** close hides to the tray. The Agent webview keeps running until **Quit**.
+- **Phone (Capacitor / Tauri mobile):** Keep Awake + background fetch/processing. Also disable battery optimization on Android.
+- **Browser tab:** the OS may freeze JS after locking the screen. Use the native build for jobs that must not stop.
+- The Agent iframe is **not** reloaded on hide/show. Last URL is restored.
+
 ## Global window sizes
 
 - Default desktop: **1440×900** (16:10)

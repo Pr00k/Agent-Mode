@@ -1,5 +1,14 @@
 import { detectLang, strings, type Key, type Lang } from "./i18n";
 import { isBridgeOn, isTauri, runBridge, setBridgeOn } from "./bridge";
+import {
+  isAwakeOn,
+  isBgOn,
+  restoreSession,
+  saveSession,
+  setAwakeOn,
+  setBgOn,
+  startKeepAlive,
+} from "./keepalive";
 
 const AGENT = "https://arena.ai/agent";
 const ROUTES: Record<string, string> = {
@@ -24,6 +33,8 @@ const bridgeEnabled = document.getElementById("bridge-enabled") as HTMLInputElem
 const zoom = document.getElementById("zoom") as HTMLInputElement;
 const compact = document.getElementById("compact") as HTMLInputElement;
 const autohide = document.getElementById("autohide") as HTMLInputElement;
+const bgRun = document.getElementById("bg-run") as HTMLInputElement;
+const stayAwake = document.getElementById("stay-awake") as HTMLInputElement;
 
 let lang: Lang = detectLang();
 let tabId = 1;
@@ -85,6 +96,7 @@ function navigate(id: string): void {
   loader.hidden = false;
   fallback.hidden = true;
   frame.src = url;
+  saveSession(url);
   setActiveNav(id === "new" ? "agent" : id);
   if (id === "new") addTab(url);
 }
@@ -147,7 +159,15 @@ async function nativeWindow(action: string): Promise<void> {
   if (!isTauri()) return;
   const { getCurrentWindow } = await import("@tauri-apps/api/window");
   const w = getCurrentWindow();
-  if (action === "win-close") await w.close();
+  if (action === "win-close") {
+    if (isBgOn()) {
+      const { invoke } = await import("@tauri-apps/api/core");
+      await invoke("hide_to_tray");
+      showToast(t("hiddenOk"));
+      return;
+    }
+    await w.close();
+  }
   if (action === "win-min") await w.minimize();
   if (action === "win-max") await w.toggleMaximize();
   if (action === "pin") {
@@ -275,8 +295,25 @@ function wire(): void {
     layout();
   });
 
+  bgRun.checked = isBgOn();
+  bgRun.addEventListener("change", () => {
+    setBgOn(bgRun.checked);
+    void startKeepAlive();
+    showToast(bgRun.checked ? t("hiddenOk") : t("settings"));
+  });
+  stayAwake.checked = isAwakeOn();
+  stayAwake.addEventListener("change", () => {
+    setAwakeOn(stayAwake.checked);
+    void startKeepAlive();
+  });
+
   window.addEventListener("resize", layout);
   window.addEventListener("online", () => showToast(t("connecting")));
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "hidden" && isBgOn()) {
+      saveSession(frame.src || AGENT);
+    }
+  });
 }
 
 async function registerSw(): Promise<void> {
@@ -292,5 +329,10 @@ applyI18n();
 layout();
 addTab(AGENT);
 wire();
+const restored = restoreSession();
+if (restored && restored.startsWith("https://arena.ai")) {
+  frame.src = restored;
+}
 void bootTauri();
 void registerSw();
+void startKeepAlive();

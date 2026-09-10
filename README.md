@@ -35,6 +35,8 @@ npm run dev
 - عربي / English
 - أحجام عالمية: 1440×900، حد أدنى 390×640
 - Tray + deep link `arena-agent://` في النسخة الأصلية
+- العمل في الخلفية: إغلاق النافذة يُخفي للتري، الشاشة لا تُوقف المشروع (Wake Lock + Keep Awake)
+- البناء: انظر `BUILD.md` — Vite 8.3 · TypeScript 7 · Tauri 2.11 · Capacitor 8.5
 
 ## مجلدات
 
